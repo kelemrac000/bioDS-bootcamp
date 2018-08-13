@@ -261,21 +261,113 @@ corrplot(M, type="upper", order="hclust",
 corrplot(M, type="upper", order="hclust", tl.col="black", tl.srt=45)
 
 
+#17) How many genes on chr.21 from the reference (chr.21.ref) were in the expression dataframe chr.21.expn? 
+#HINT: use dim() on the dataframes mentioned above. Remeber that each row contains information for 1 gene. 
+
+chr.21.intersect<- intersect(rownames(chr.21.expn), chr.21.ref$Approved.Symbol)
+chr.21.intersect
 
 
-#17) Create a corrplot with the method="color" and with gene names in a readable size (fontsize change). Use function t(x) to transpose data frame
+#18) Calculate the total counts (the sum) for each gene, across all samples, in the chr.21.expn dataframe.
+?rowSums
+
+#uncomment this and complete the code. 
+# gene.count.totals <- rowSums(data.frame)
+gene.count.totals <- rowSums(chr.21.expn)
+
+
+#18)  Use "gene.count.totals" to find which genes have at least total 50 counts across all samples 
+
+#uncomment this and complete the code. 
+# genes.atleast.50 <- variable >= 50
+genes.atleast.50 <- gene.count.totals >= 50
+
+
+
+#19) use head() to look at the results of "genes.atleast.50".  Define a boolean value below.
+# Then Use class() and str()  to figure out what type of object it is. 
+
+head(genes.atleast.50)
+class(genes.atleast.50)
+str(genes.atleast.50)
+
+
+#20) Booleans can be used to filter a data.frame. Any rows/columns with TRUE are kept, and 
+#rows/columns with FALSE are filtered out. This makes sense, since FALSE means that entry in the dataframe DID NOT meet your criteria. 
+#Use the boolean variable you created to select on the genes with at least a sum of 50 counts. 
+
+# uncomment this and run the code.
+chr.21.high.expn <- chr.21.expn[genes.atleast.50, ]
+
+
+
+#use dim() on the chr.21.high.expn to see how many genes had at least 50 total counts or more. 
+dim(chr.21.high.expn)
+
+#WHY IS THIS IMPORTANT? Very lowly expressed genes are "noisy" and could be due to an error in the RNAseq process. 
+#Filtering genes for those with high counts allows us to be more confident that these genes were measured accurately (accurate counts from RNAseq)
+
+
+
+#21) to examine the relationship (similarity between) each patient, create a corrplot with chr.21.high.expn.
+#Create a corrplot with the chr.21.high.expn,  the method="color" and with gene names in a readable size (fontsize change).
+#change the text color to black. Change the order to "hclust". 
+#Remember too look at the tutorial in question #16 and the documentation.
+?corrplot
+
+
+corrplot(chr.21.high.expn, method = "color", order = "hclust", tl.col = "black")
+
+#Save this plot to a pdf file. #remember that the syntax below
+#pdf("filename.pdf")
+#corrplot(yourCorrelationMatrix, options)
+#dev.off()
+
+?pdf
+?dev.off
+
+# 22)To examine the relationship between each gene (correlation of each gene), we need to switch our columns into rows and rows into columns.
+#We use the transpose function to do this. Use the chr.21.high.expn dataframe.
+
+# uncomment this and run the code. the "tr" will remind us that it is transposed.
+
+chr.21.high.tr <- t(chr.21.high.expn)
+chr.21.high.tr
+
+#use head() and dim() to check out what happened to the new data.frame you created.
+
+head(chr.21.high.tr)
+dim(chr.21.high.tr)
+
+#This transformation caused there be 21 rows and 104 columns.
+#the Y-axis shows the patients while the X-axis shows the genes that were being analyzed.
+#It's a heat map showing correlation between a patient and gene expression rather than patient to patient
+
+#23) Create a corrplot with the chr.21.high.tr  the method="color" and with gene names in a readable size (fontsize change).
+#change the text color to black. Change the order to "hclust".
+#Remember too look at the tutorial in question #16 and the documentation.
+?corrplot
+
+corrplot(chr.21.high.tr, method = "color", order = "hclust", tl.col = "black")
+
+#Save this plot to a pdf file.
+
+chr.21.tr <- cor(chr.21.high.tr)
+pdf("Myplot3.pdf")
+corrplot(chr.21.tr, method = "color", order = "hclust", tl.col = "black", tl.cex = 0.3)
+dev.off()
 
 head(chr.21.expn)
 
-chr.21.P<- cor(chr.21.expn)
+#need to transpose data frame, use function t(x)
+
+chr.21.P <- cor(chr.21.expn)
 chr.21.P
-corrplot(chr.21.P, method="color")
 
+#transposing is useless to previous matrix because the X-axis and Y-axis are the same exact variable
 
-
-
-
-
-
+pdf("Myplot.pdf")
+corrplot(chr.21.P, method = "color")
+dev.off()
 
 
